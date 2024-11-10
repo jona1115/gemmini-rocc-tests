@@ -1,3 +1,10 @@
+# gemmini-rocc-tests for CPRE 581
+- This is branched off the forked directory's 1a1a1c6 commit, hence the name of the default branch.
+- This is to be used with other directories forked by me, eg [Chipyard](https://github.com/jona1115/chipyard/tree/main), [Gemmini](https://github.com/jona1115/gemmini), and [BOOM](https://github.com/jona1115/riscv-boom).
+
+---
+# Below are the original README.md content:
+
 # Quickstart
 1. Clone submodules:
     ```bash
