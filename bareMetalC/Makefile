@@ -1,6 +1,7 @@
 include $(abs_top_srcdir)/Makefrag
 
 tests = \
+	MaMA_matmul_cpu \
 	MaMA_matmul_ws \
 	mvin_mvout \
 	mvin_mvout_zeros \

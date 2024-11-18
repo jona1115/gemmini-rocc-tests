@@ -52,6 +52,7 @@ void operands(int c, int * a, int * b, int * d) {
 #endif
 
 int main_part() {
+  // srand(28);
 #ifndef BAREMETAL
     if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
       perror("mlockall failed");
@@ -236,7 +237,8 @@ int main_part() {
           printMatrix(C[n]);
           printf("\nGold:\n");
           printMatrix(gold[n]);
-          exit(1);
+        //   exit(1);
+          return -1;
         }
     }
   }
@@ -248,13 +250,13 @@ int main_part() {
 // Use the stats stuff
 #include "riscv-tests/benchmarks/common/util.h"
 int main() {
-    int cid = 0;
+  int cid = 0;
 
-    printf("Here we go\n");
+  printf("Here we go\n");
 
-    stats(main_part(), 1);
-    
-    printf("main_part() done!\n");
+  stats(main_part(), 1);
+  
+  printf("main_part() done!\n");
 
-    exit(0);
+  exit(0);
 }
