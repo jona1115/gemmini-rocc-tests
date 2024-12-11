@@ -39,7 +39,6 @@ void print_binary(elem_t value) {
     }
 }
 
-//void print_matrix_binary
 
 int main_part() {
 #ifndef BAREMETAL
@@ -54,16 +53,9 @@ int main_part() {
 
   printf("Initialize our input and output matrices in main memory\n");
   elem_t A[DIM][DIM] row_align(1); // = {{0,1,2,3}, {4,5,6,7}, {8,9,10,11}, {12,13,14,15}};
-  elem_t B[DIM][DIM] row_align(1); // All 1's
+  elem_t B[DIM][DIM] row_align(1); // Identity 2's for scaling
   elem_t C[DIM][DIM] row_align(1); // Output
-  elem_t D[DIM][DIM] row_align(1); // All 0's
-
-
-//   elem_t A[DIM][DIM]; // = {{0,1,2,3}, {4,5,6,7}, {8,9,10,11}, {12,13,14,15}};
-//   elem_t B[DIM][DIM] = {{2,0,0,0},{0,2,0,0}, {0,0,2,0}, {0,0,0,2}}; // Output // All 1's
-//   elem_t C[DIM][DIM];
-//   elem_t D[DIM][DIM]; // All 0's
-
+  elem_t D[DIM][DIM] row_align(1); // All 0's or tags (due to order of operations overwrite)
 
   for (size_t i = 0; i < DIM; i++)
   {
@@ -80,7 +72,6 @@ int main_part() {
                 B[i][j] = (i << 2) | (j);
             }
             D[i][j] = (i << 2) | (j);
-            //D[i][j] = 0;
     }
   }
   
@@ -95,14 +86,10 @@ int main_part() {
   printf("  Note: The scratchpad is \"row-addressed\", where each address contains one matrix row\n");
   uint32_t A_sp_addr = 0;
   uint32_t B_sp_addr = DIM;
-  uint32_t D_sp_addr = 2*DIM; //GARBAGE_ADDR; //2*DIM;
+  uint32_t D_sp_addr = 2*DIM; //GARBAGE_ADDR; 
 
-  // size_t C_sp_addr = 3*DIM;
+  // uint32_t C_sp_addr = 3*DIM;
   uint32_t C_addr_acc = 1 << (ADDR_LEN-1); //MSB set high for ADDR when addressing ACCUMULATOR
-
-  // size_t In_sp_addr = 0;
-  // size_t Out_sp_addr = DIM;
-  // size_t Identity_sp_addr = 2*DIM;
 
   printf("Move \"A\" matrix from main memory into Gemmini's scratchpad\n");
   gemmini_config_ld(DIM * sizeof(elem_t));
@@ -119,7 +106,6 @@ int main_part() {
   gemmini_config_ex(WEIGHT_STATIONARY, 0, 0);
   printf("Preload \"B\" weight matrix and \"C\" output matrix address\n");
   gemmini_preload(B_sp_addr, C_addr_acc); 
-  //gemmini_preload_zeros(C_addr_acc);
   printf("Multiply \"A\" matrix with \"B\" matrix with a bias of D Matrix\n");
   gemmini_compute_preloaded(A_sp_addr, D_sp_addr);
 
@@ -155,20 +141,8 @@ int main_part() {
   for (int i = 0; i < DIM; i++) {
       for (int j = 0; j < DIM; j++) {
           elem_t C_value = C[i][j];
-          // Extract the top 8 bits: data
           int16_t C_top_half = (C_value >> 16);
-          // Extract the 2 bits for row index (bits 7-6)
           int16_t C_row_bottom = (C_value) & 0xFFFF;
-          //  unsigned short C_value = C[i][j];
-          // // Extract the top 8 bits: data
-          // unsigned char C_top_half = (C_value >> 8) & 0xFF;
-          // // Extract the 2 bits for row index (bits 7-6)
-          // unsigned char C_row_index = (C_value >> 6) & 0x03;
-          // // Extract the 2 bits for column index (bits 5-4)
-          // unsigned char C_col_index = (C_value >> 4) & 0x03;
-          // printf("C[%d][%d] = Top 8 bits: %d, Row index (bits 7-6): %d, Column index (bits 5-4): %d\n",
-          //        i, j, C_top_half, C_row_index, C_col_index);
-          //printf("C[%d][%d] = 0x%x   ", i, j, C_value);
           printf("   C[%d][%d] = 0b", i, j);
           print_binary(C_value);
       }
