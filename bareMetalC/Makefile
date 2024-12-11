@@ -3,6 +3,8 @@ include $(abs_top_srcdir)/Makefrag
 tests = \
 	MaMA_matmul_cpu \
 	MaMA_matmul_ws \
+	MaMA_test \
+	complex_numbers \
 	mvin_mvout \
 	mvin_mvout_zeros \
 	mvin_mvout_stride \

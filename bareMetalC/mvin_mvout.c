@@ -48,6 +48,7 @@ int main() {
   gemmini_fence();
 
   for (size_t n = 0; n < N; ++n)
+  {
     if (!is_equal(In[n], Out[n])) {
       printf("Matrix %u:\n", n);
       printMatrix(In[n]);
@@ -57,6 +58,12 @@ int main() {
 
       exit(1);
     }
+      // printf("Matrix %u:\n", n);
+      // printMatrix(In[n]);
+      // printf("Matrix %u output:\n", n);
+      // printMatrix(Out[n]);
+      // printf("\n");
+  }
 
   exit(0);
 }
