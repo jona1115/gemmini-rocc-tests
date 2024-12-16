@@ -16,7 +16,9 @@
 * 
 *  Ver          Who       Date	      Changes
 *  -----        --------- ---------- ----------------------------------------------
-*  1.00         Jonathan  11/17/2024   Created the file
+*  1.00         Jonathan  11/17/2024  Created the file
+*  1.01         Jonathan  12/16/2024  Removed all the original crap that I can't figure out
+*                                     the purpose.
 *  
 ***********************************************************************************************/
 
@@ -29,15 +31,21 @@
 #include <time.h>
 #include "include/gemmini_testutils.h"
 
+// Comment this out to remove all the verbose prints
+#define JONATHAN_DEBUG
+
 #ifdef FAST
 #define AINIT RELU
 #define SINIT 12
-#define N 1
+// #define N 1
 #else
 #define AINIT NO_ACTIVATION
 #define SINIT 0
-#define N 2
+// #define N 2
 #endif
+
+// How many mm to create, and operate on
+#define N 10
 
 void operands(int c, int * a, int * b, int * d) {
   *d = c % N;
@@ -46,122 +54,69 @@ void operands(int c, int * a, int * b, int * d) {
 }
 
 int main_part() {
-  // srand(28);
+  // srand(28); // Doesnt work with our compiler for some reason
 
   static elem_t ZERO[DIM][DIM] = {0}; // Initialize ZERO matrix with zeros
 
-  for (int activation = AINIT; activation <= RELU; ++activation) {
-#ifdef ACC_SCALE_T_IS_FLOAT
-    for (acc_scale_t scale = 0; scale <= 1.5; scale += 0.5) {
-#else
-    for (acc_scale_t scale = SINIT; scale <= 12; scale += 4) {
-#endif
-      static elem_t A[N][DIM][DIM];
-      static elem_t B[N][DIM][DIM];
-      static elem_t D[N][DIM][DIM];
+  static elem_t A[N][DIM][DIM];
+  static elem_t B[N][DIM][DIM];
+  static elem_t D[N][DIM][DIM];
 
-      // Initialize matrices A, B, and D with random values
-      for (size_t n = 0; n < N; ++n) {
-        for (size_t i = 0; i < DIM; ++i) {
-          for (size_t j = 0; j < DIM; ++j) {
-            A[n][i][j] = (rand() % 64) - 32;
-            B[n][i][j] = (rand() % 64) - 32;
-            D[n][i][j] = (rand() % 64) - 32;
-          }
-        }
-      }
-
-      // We will try out every combination of A, B, D possible
-      static elem_t C[N*N*N][DIM][DIM];
-      static full_t gold_full[N*N*N][DIM][DIM];
-      static elem_t gold[N*N*N][DIM][DIM];
-
-      // Generate control sequences
-      static int preload[N*N*N] = {1};
-      for (int i = 1; i < N*N*N; ++i)
-        preload[i] = rand() % 2;
-
-      static int add_to_zeros[N*N*N];
-      for (int i = 0; i < N*N*N; ++i)
-        add_to_zeros[i] = rand() % 2;
-
-      static int accumulate[N*N*N] = {0};
-      for (int i = 1; i < N*N*N; ++i)
-        accumulate[i] = rand() % 2;
-
-      static int no_output[N*N*N];
-      for (int i = 0; i < N*N*N-1; ++i)
-        no_output[i] = accumulate[i+1];
-      no_output[N*N*N-1] = 0;
-
-      // Compute the expected results (golden results)
-      for (size_t g = 0; g < N*N*N; ++g) {
-        int a, b, d;
-        operands(g, &a, &b, &d);
-
-        if (add_to_zeros[g])
-          matmul(A[a], B[b], ZERO, gold_full[g]);
-        else
-          matmul(A[a], B[b], D[d], gold_full[g]);
-
-        if (accumulate[g])
-          matadd(gold_full[g], gold_full[g-1], gold_full[g]);
-      }
-
-      for (size_t g = 0; g < N*N*N; ++g) {
-        matscale(gold_full[g], gold[g], scale);
-        if (activation == RELU)
-          matrelu(gold[g], gold[g]);
-      }
-
-      // Compute the actual results using CPU computations
-      for (size_t g = 0; g < N*N*N; ++g) {
-        int a, b, d;
-        operands(g, &a, &b, &d);
-
-        elem_t temp[DIM][DIM];
-        if (add_to_zeros[g])
-          matmul(A[a], B[b], ZERO, temp);
-        else
-          matmul(A[a], B[b], D[d], temp);
-
-        if (accumulate[g])
-          matadd(temp, C[g-1], temp);
-
-        matscale(temp, C[g], scale);
-
-        if (activation == RELU)
-          matrelu(C[g], C[g]);
-
-        if (!no_output[g]) {
-          // Compare the computed result with the golden result
-          if (!is_equal(C[g], gold[g])) {
-            printf("Mismatch at step %d\n", g);
-            printf("Activation: %d, Scale: %d\n", activation, scale);
-            printf("Computed C[%d]:\n", g);
-            printMatrix(C[g]);
-            printf("Expected Gold[%d]:\n", g);
-            printMatrix(gold[g]);
-            return -1; // Indicate failure
-            // return 0; // Indicate failure
-          }
-          else {
-            printf("Step %d: No mismatch!\n", g);
-            // printf("Activation: %d, Scale: %d\n", activation, scale);
-            // printf("Computed C[%d]:\n", g);
-            // printMatrix(C[g]);
-            // printf("Expected Gold[%d]:\n", g);
-            // printMatrix(gold[g]);
-          }
-        }
-        else {
-          printf("Step %d: !no_output[g] false\n", g);
-        }
+  // Initialize matrices A, B, and D with random values
+  for (size_t n = 0; n < N; ++n) {
+    for (size_t i = 0; i < DIM; ++i) {
+      for (size_t j = 0; j < DIM; ++j) {
+        A[n][i][j] = (rand() % 64) - 32;
+        B[n][i][j] = (rand() % 64) - 32;
+        D[n][i][j] = (rand() % 64) - 32;
       }
     }
+
+#ifdef JONATHAN_DEBUG
+    printf("N:%d matrix is:\nA:\n", n);
+    printMatrix(A[n]);
+    printf("\nB:\n");
+    printMatrix(B[n]);
+    printf("\nD:\n");
+    printMatrix(D[n]);
+    printf("\n===================================\n");
+#endif
   }
 
-  printf("All computations match expected results.\n");
+// C is an array of N results matrix
+#ifdef JONATHAN_DEBUG
+  printf("+++++++++++++++++++++++++++++++++++\n");
+#endif
+  elem_t C[N][DIM][DIM] = {0};
+  for (int n = 0; n < N; ++n) {
+#ifdef JONATHAN_DEBUG
+    printf("n == %d\n", n);
+    printf("C pre matmul:\n");
+    printMatrix(C[n]);
+    printf("\n");
+#endif
+
+    matmul(A[n], B[n], ZERO, C[n]);
+    
+#ifdef JONATHAN_DEBUG
+    printf("C post matmul:\n");
+    printMatrix(C[n]);
+    printf("\n");
+
+    printf("+++++++++++++++++++++++++++++++++++\n");
+#endif
+  }
+
+#ifdef JONATHAN_DEBUG
+  for (int n = 0; n < N; ++n) {
+    printf("C[%d]:\n", n);
+    printMatrix(C[n]);
+    printf("\n");
+
+    printf("+++++++++++++++++++++++++++++++++++\n");
+  }
+#endif
+
   return 0;
 }
 

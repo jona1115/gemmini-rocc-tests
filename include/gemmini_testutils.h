@@ -27,6 +27,7 @@
 // #define GEMMINI_ASSERTIONS
 
 // Matmul utility functions
+// C=D+A*B
 static void matmul(elem_t A[DIM][DIM], elem_t B[DIM][DIM], elem_t D[DIM][DIM], full_t C_full[DIM][DIM]) {
   for (size_t r = 0; r < DIM; r++)
     for (size_t c = 0; c < DIM; c++) {

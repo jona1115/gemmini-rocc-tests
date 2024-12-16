@@ -13,7 +13,9 @@
 * 
 *  Ver          Who       Date	      Changes
 *  -----        --------- ---------- ----------------------------------------------
-*  1.00         Jonathan  11/17/2024   Created the file
+*  1.00         Jonathan  11/17/2024  Created the file
+*  1.01         Jonathan  12/16/2024  Removed all the original crap that I can't figure out
+*                                     the purpose.
 *  
 ***********************************************************************************************/
 
@@ -30,15 +32,22 @@
 #include "include/gemmini_testutils.h"
 
 
+// Comment this out to remove all the verbose prints
+// #define JONATHAN_DEBUG
+
 #ifdef FAST
 #define AINIT RELU
 #define SINIT 12
-#define N 1
+// #define N 1
 #else
 #define AINIT NO_ACTIVATION
 #define SINIT 0
-#define N 2
+// #define N 2
 #endif
+
+// How many mm to create, and operate on
+#define N 10
+
 
 
 void operands(int c, int * a, int * b, int * d) {
