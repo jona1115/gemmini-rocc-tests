@@ -1,12 +1,12 @@
 /*************************************************************************************************
 *  
 *  Author   : CPRE 581 Project Group: "SADD MaMA Rocket" (https://github.com/jona1115/chipyard)
-*  Date     : 11/17/2024
+*  Date     : 12/16/2024
 *  
 *  
-*  MaMA_matmul_cpu.c:
-*  A matmul code that runs on CPU only. This is inspired by riscv-tests/benchmarks/mt-matmul.c, 
-*  but using gemmini_testutils.h's functions for fair benchmarking.
+*  MaMA_matmul_cpu_sparse.c:
+*  This is a modification of the MaMA_matmul_ws.c file, changes is that the matrix used to test
+*  is sparse and has a sparsity of 75%. 
 *  
 *  
 *  Note: This file is written by, or written with the aid of, ChatGPT.
@@ -16,9 +16,7 @@
 * 
 *  Ver          Who       Date	      Changes
 *  -----        --------- ---------- ----------------------------------------------
-*  1.00         Jonathan  11/17/2024  Created the file
-*  1.01         Jonathan  12/16/2024  Removed all the original crap that I can't figure out
-*                                     the purpose.
+*  1.00         Jonathan  12/16/2024  Created the file
 *  
 ***********************************************************************************************/
 
@@ -46,7 +44,7 @@
 #endif
 
 // How many mm to create, and operate on
-#define N 1
+#define N 10
 
 void operands(int c, int * a, int * b, int * d) {
   *d = c % N;
@@ -67,9 +65,9 @@ int main_part() {
   for (size_t n = 0; n < N; ++n) {
     for (size_t i = 0; i < DIM2; ++i) {
       for (size_t j = 0; j < DIM2; ++j) {
-        A[n][i][j] = (rand() % 64) - 32;
-        B[n][i][j] = (rand() % 64) - 32;
-        D[n][i][j] = (rand() % 64) - 32;
+        A[n][i][j] = ((float)rand() / (float)255) < MaMA_TEST_SPARSITY ? 0 : (rand() % 64) - 32; // Unary for generating sprasity
+        B[n][i][j] = ((float)rand() / (float)255) < MaMA_TEST_SPARSITY ? 0 : (rand() % 64) - 32; // Unary for generating sprasity
+        D[n][i][j] = ((float)rand() / (float)255) < MaMA_TEST_SPARSITY ? 0 : (rand() % 64) - 32; // Unary for generating sprasity
       }
     }
 

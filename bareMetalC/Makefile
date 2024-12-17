@@ -1,6 +1,8 @@
 include $(abs_top_srcdir)/Makefrag
 
 tests = \
+	MaMA_matmul_ws_sparse \
+	MaMA_matmul_cpu_sparse \
 	MaMA_matmul_cpu \
 	MaMA_matmul_ws \
 	MaMA_test \

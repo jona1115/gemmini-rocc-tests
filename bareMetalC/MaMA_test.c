@@ -1,6 +1,6 @@
 /*************************************************************************************************
 *  
-*  Author   : CPRE 581 Project Group: "MaMA for BOOM" (https://github.com/jona1115/chipyard)
+*  Author   : CPRE 581 Project Group: "SADD MaMA Rocket" (https://github.com/jona1115/chipyard)
 *  Date     : 12/4/2024
 *  
 *  
