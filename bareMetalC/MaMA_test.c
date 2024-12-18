@@ -57,24 +57,40 @@ int main_part() {
   elem_t C[DIM][DIM] row_align(1); // Output
   elem_t D[DIM][DIM] row_align(1); // All 0's or tags (due to order of operations overwrite)
 
+  
   for (size_t i = 0; i < DIM; i++)
   {
     for (size_t j = 0; j < DIM; j++)
     {
-            // Combine to a 16-bit value
-            A[i][j] = ((i*DIM+j) << 16) | (i << 2) | (j);
-            if (i == j) 
-            {
-                B[i][j] = (2 << 16) | (i << 2) | (j);
-            }
-            else
-            {
-                B[i][j] = (i << 2) | (j);
-            }
-            D[i][j] = (i << 2) | (j);
+      A[i][j] = 0;
+      //A[i][j] = ((i*DIM+j) << 16) | (i << 2) | (j);
+
+      B[i][j] = (1 << 16) | (i << 2) | (j); // All 1's
+
+        /*
+        // Combine to a 16-bit value
+        A[i][j] = ((i*DIM+j) << 16) | (i << 2) | (j);
+        if (i == j) 
+        {
+            B[i][j] = (2 << 16) | (i << 2) | (j);
+        }
+        else
+        {
+            B[i][j] = (i << 2) | (j);
+        }
+        */
+        //D[i][j] = (i << 2) | (j);
     }
   }
   
+  A[0][0] = (elem_t) ((2 << 16) | (1 << 15) | (2 << 2) | (0)); //last
+  A[0][1] = (elem_t) ((2 << 16) | (0 << 2) | (1));
+  A[0][3] = (elem_t) ((2 << 16) | (1 << 15) | (0 << 2) | (3)); //last
+  A[1][3] = (elem_t) ((2 << 16) | (1 << 15) | (3 << 2) | (3)); //last
+
+
+
+
   // printf("\"A\" matrix:\n");
   // printMatrix(A);
   // printf("\"B\" matrix:\n");
@@ -86,7 +102,7 @@ int main_part() {
   printf("  Note: The scratchpad is \"row-addressed\", where each address contains one matrix row\n");
   uint32_t A_sp_addr = 0;
   uint32_t B_sp_addr = DIM;
-  uint32_t D_sp_addr = 2*DIM; //GARBAGE_ADDR; 
+  uint32_t D_sp_addr = GARBAGE_ADDR; //2*DIM; //GARBAGE_ADDR; 
 
   // uint32_t C_sp_addr = 3*DIM;
   uint32_t C_addr_acc = 1 << (ADDR_LEN-1); //MSB set high for ADDR when addressing ACCUMULATOR
@@ -94,7 +110,10 @@ int main_part() {
   printf("Move \"A\" matrix from main memory into Gemmini's scratchpad\n");
   gemmini_config_ld(DIM * sizeof(elem_t));
   gemmini_config_st(DIM * sizeof(elem_t));
-  gemmini_mvin(A, A_sp_addr);
+
+  //gemmini_extended_mvin(dram_addr, spad_addr, cols, rows)
+  //gemmini_mvin(A, A_sp_addr);
+  gemmini_extended_mvin(A, A_sp_addr, 4, 2)
 
   printf("Move \"B\" matrix from main memory into Gemmini's scratchpad\n");
   gemmini_mvin(B, B_sp_addr);
@@ -105,9 +124,17 @@ int main_part() {
   printf("Config EX\n");
   gemmini_config_ex(WEIGHT_STATIONARY, 0, 0);
   printf("Preload \"B\" weight matrix and \"C\" output matrix address\n");
-  gemmini_preload(B_sp_addr, C_addr_acc); 
+
+  //gemmini_extended_preload(BD, C, BD_cols, BD_rows, C_cols, C_rows)
+  //gemmini_preload(B_sp_addr, C_addr_acc); 
+  gemmini_extended_preload(B_sp_addr, C_addr_acc, 4, 4, 4, 4)
+
   printf("Multiply \"A\" matrix with \"B\" matrix with a bias of D Matrix\n");
-  gemmini_compute_preloaded(A_sp_addr, D_sp_addr);
+  //gemmini_extended_compute_preloaded(A, BD, A_cols, A_rows, BD_cols, BD_rows)
+  //gemmini_compute_preloaded(A_sp_addr, D_sp_addr);
+  //gemmini_extended_compute_preloaded(A_sp_addr, D_sp_addr, 4, 2, 4, 4)
+  gemmini_extended_compute_preloaded(A_sp_addr, D_sp_addr, 4, 2, 4, 4)
+
 
   printf("Move \"Out\" matrix from Gemmini's scratchpad into main memory\n");
   gemmini_config_st(DIM * sizeof(elem_t));
@@ -118,6 +145,7 @@ int main_part() {
 
   printf("Check whether \"In\" and \"Out\" matrices are identical\n");
 
+  
   printf("\"A\" matrix:\n");
   printMatrix(A);
   printf("\"C\" matrix:\n");
@@ -151,6 +179,7 @@ int main_part() {
 
   printf("Input and output matrices are identical, as expected\n");
   //exit(0);
+  
 }
 
 
@@ -164,6 +193,7 @@ int main() {
   stats(main_part(), 1);
   
   printf("main_part() done!\n");
+
 
   exit(0);
 }

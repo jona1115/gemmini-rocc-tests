@@ -6,6 +6,7 @@ tests = \
 	MaMA_matmul_cpu \
 	MaMA_matmul_ws \
 	MaMA_test \
+	MaMA_timing_test \
 	complex_numbers \
 	mvin_mvout \
 	mvin_mvout_zeros \
