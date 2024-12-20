@@ -1,7 +1,7 @@
 # Test Branch for Project-SADD-MaMA
-- This is the branch used in Project SADD MaMA. See [here](www.todo.com) for more details.
+- This is the branch used in Project SADD MaMA. See [here](https://github.com/jona1115/chipyard/tree/Project-SADD-MaMA) for more details.
 - This is branched off the forked directory's 1a1a1c6 commit.
-- This is to be used with other directories forked by me, eg [Chipyard](www.todo.com), [Gemmini](www.todo.com), and [BOOM](www.todo.com).
+- This is to be used with other directories forked by me, e.g., [Chipyard](https://github.com/jona1115/chipyard/tree/Project-SADD-MaMA), [Gemmini](https://github.com/jona1115/gemmini/tree/Project-SADD-MaMA).
 
 Note: Tests we wrote are in the bareMetalC folder, indented by `MaMA_`.
 
