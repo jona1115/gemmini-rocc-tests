@@ -4,7 +4,7 @@
 - This is to be used with other directories forked by me, eg [Chipyard](www.todo.com), [Gemmini](www.todo.com), and [BOOM](www.todo.com).
 
 ---
-# Below are the original README.md content:
+Below content are from original README
 
 # Quickstart
 1. Clone submodules:
