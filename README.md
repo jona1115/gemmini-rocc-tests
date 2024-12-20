@@ -3,6 +3,8 @@
 - This is branched off the forked directory's 1a1a1c6 commit.
 - This is to be used with other directories forked by me, eg [Chipyard](www.todo.com), [Gemmini](www.todo.com), and [BOOM](www.todo.com).
 
+Note: Tests we wrote are in the bareMetalC folder, indented by `MaMA_`.
+
 ---
 Below content are from original README
 
